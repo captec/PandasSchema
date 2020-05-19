@@ -82,7 +82,11 @@ class _SeriesValidation(_BaseValidation):
 
         # Calculate which columns are valid using the child class's validate function, skipping empty entries if the
         # column specifies to do so
-        simple_validation = ~self.validate(series)
+        simp_val = self.validate(series)
+        simple_validation = ~simp_val
+        # tilda inversion sometimes returns integers (like -2), catch this case
+        if not isinstance(simple_validation[0], bool):
+            simple_validation = simp_val.apply(lambda v: not(v))
         if column.allow_empty:
             # Failing results are those that are not empty, and fail the validation
             # explicitly check to make sure the series isn't a category because issubdtype will FAIL if it is

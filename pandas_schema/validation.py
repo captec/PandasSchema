@@ -199,7 +199,7 @@ class CustomElementValidation(_SeriesValidation):
 
     def validate(self, series: pd.Series) -> pd.Series:
         validated = series.apply(self._validation)
-        if validated.dtype == np.dtype('O')
+        if validated.dtype == np.dtype('O'):
             try:
                 first_type = type(validated.iloc[0])  # try to convert dtype
                 validated = validated.astype(first_type)

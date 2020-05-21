@@ -11,6 +11,8 @@ from .validation_warning import ValidationWarning
 from .errors import PanSchArgumentError
 from pandas.api.types import is_categorical_dtype, is_numeric_dtype
 
+import pdb
+
 
 class _BaseValidation:
     """
@@ -82,15 +84,22 @@ class _SeriesValidation(_BaseValidation):
 
         # Calculate which columns are valid using the child class's validate function, skipping empty entries if the
         # column specifies to do so
-        # tilda inversion sometimes returns integers (like -2), catch this case
+        if column.allow_empty and len(series) == 0:
+            return errors  # return empty errors list
+
         simple_validation = -self.validate(series)
+
         if column.allow_empty:
             # Failing results are those that are not empty, and fail the validation
             # explicitly check to make sure the series isn't a category because issubdtype will FAIL if it is
             if is_categorical_dtype(series) or is_numeric_dtype(series):
                 validated = ~series.isnull() & simple_validation
+                # This may need to be caught as above
             else:
-                validated = (series.str.len() > 0) & simple_validation
+                try:
+                    validated = (series.str.len() > 0) & simple_validation
+                except AttributeError:  # catches calling series.str on something like a Period Series
+                    validated = simple_validation
 
         else:
             validated = simple_validation

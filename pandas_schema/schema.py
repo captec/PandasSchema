@@ -5,6 +5,8 @@ from .errors import PanSchInvalidSchemaError, PanSchArgumentError
 from .validation_warning import ValidationWarning
 from .column import Column
 
+import pdb
+
 
 class Schema:
     """
@@ -65,6 +67,7 @@ class Schema:
 
         # We associate the column objects in the schema with data frame series either by name or by position, depending
         # on the value of self.ordered
+        #pdb.set_trace()
         if self.ordered:
             series = [x[1] for x in df.iteritems()]
             column_pairs = zip(series, self.columns)

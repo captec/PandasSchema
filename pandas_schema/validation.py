@@ -198,7 +198,14 @@ class CustomElementValidation(_SeriesValidation):
         super().__init__(message=message)
 
     def validate(self, series: pd.Series) -> pd.Series:
-        return series.apply(self._validation)
+        validated = series.apply(self._validation)
+        if validated.dtype == np.dtype('O')
+            try:
+                first_type = type(validated.iloc[0])  # try to convert dtype
+                validated = validated.astype(first_type)
+            except:
+                pass
+        return validated
 
 
 class InRangeValidation(_SeriesValidation):

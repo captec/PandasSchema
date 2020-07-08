@@ -105,11 +105,16 @@ class _SeriesValidation(_BaseValidation):
             validated = simple_validation
 
         # Cut down the original series to only ones that failed the validation
-        indices = series.index[validated]
+        failing = series[validated]
+        # If failing is not of type Series, we assume it's a Dask Series.
+        # compute will convert it into a pandas series.
+        if type(failing) != pd.Series:
+            failing = failing.compute()
+        indices = failing.index
 
         # Use these indices to find the failing items. Also print the index which is probably a row number
         for i in indices:
-            element = series[i]
+            element = failing[i]
             errors.append(ValidationWarning(
                 message=self.message,
                 value=element,

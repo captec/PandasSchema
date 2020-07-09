@@ -203,13 +203,17 @@ class CustomElementValidation(_SeriesValidation):
         super().__init__(message=message)
 
     def validate(self, series: pd.Series) -> pd.Series:
-        validated = series.apply(self._validation)
-        if validated.dtype == np.dtype('O'):
-            try:
-                first_type = type(validated.iloc[0])  # try to convert dtype
-                validated = validated.astype(first_type)
-            except:
-                pass
+        if type(series) == pd.Series:
+            validated = series.apply(self._validation)
+        else:
+            # If not pd.Series, we assume this is a Dask series.
+            validated = series.apply(self._validation, meta=(series.name, 'bool'))
+
+        # Ensure that validated is of type bool.
+        # Dask seems to have some bugs where unless the type is explicitely casted,
+        # the type of the elems in the Series can be lost after compute.
+        validated = validated.astype(bool)
+
         return validated
 
 

@@ -87,7 +87,7 @@ class _SeriesValidation(_BaseValidation):
         if column.allow_empty and len(series) == 0:
             return errors  # return empty errors list
 
-        simple_validation = -self.validate(series)
+        simple_validation = ~self.validate(series).astype(bool)
 
         if column.allow_empty:
             # Failing results are those that are not empty, and fail the validation
